@@ -173,8 +173,23 @@ public:
 	// Возвращает длину списка
 	unsigned size();
 
-	// Выводит список на экран
-	void print_all(bool reverse = false);
+	// Выводит список на экран, если передать true выведет список в обратном порядке
+	void print_all(bool reverse = false)
+	{
+		cout << "Список:" << endl;
+		if (reverse == false)
+		{
+			for (Node* current = _head; current != nullptr; current = current -> next)
+				cout << current->data << endl;
+		}
+		else
+		{
+			for (Node* current = _tail; current != nullptr; current = current->previous)
+				cout << current->data << endl;
+		}
+		if (_nodesCount != 0)
+			cout << endl;
+	}
 
 	// Удаляет все элементы из [start; stop]
 	void erase(unsigned start, unsigned stop);
