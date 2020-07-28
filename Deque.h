@@ -1,6 +1,11 @@
 ﻿#ifndef DEQUE_H
 #define DEQUE_H
 
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
 template <typename T>
 class Deque
 {
@@ -22,9 +27,14 @@ private:
 		Node* next;
 		Node* previous;
 
-		Node(T data, Node* next = nullptr, Node* previous = nullptr) :
-			data(data), next(next), previous(previous)
+		Node(T data, Node* previous = nullptr, Node* current = nullptr) :
+			data(data), next(current), previous(previous)
 		{
+			if (previous != nullptr)
+			previous->next = this;
+
+			if (current != nullptr)
+			current->previous = this;
 		}
 	};
 	Node* _head;
@@ -44,19 +54,40 @@ private:
 
 	// Ищет элемент по индексу
 	// В стучае успеха возвращает указатель на него, иначе nullptr
-	Node* _get_element(unsigned index);
+	Node* _get_element(unsigned index)
+	{
+		if (index < 0 || index > _nodesCount)
+			return nullptr;
+		Node* element;
+		if (index <= _nodesCount / 2)
+		{
+			element = _head;
+			for (int i = 0; i < index; i++)
+				element = element->next;
+		}
+		else
+		{
+			element = _tail;
+			for (int i = _nodesCount - 1; i > index; i--)
+				element = element->previous;
+		}
+		return element;
+	}
 
 public:
 
 	static unsigned const NOT_FOUND = ~0;
 
-	Deque();
+	Deque() : _nodesCount(0), _head(nullptr), _tail(nullptr)
+	{
+	}
 
 	// Добавление элемента на указанную позицию
-	void insert(T element, unsigned pos);
+	void insert(unsigned pos, T element);
 
 	// Добавление элемента в начало
 	void push_front(T element);
+
 
 	// Добавление элемента в конец
 	void push_back(T element);
@@ -127,7 +158,7 @@ public:
 	void clear();
 
 	// Очистка памяти, удаление списка
-	~Deque();
+	//~Deque();
 };
 
 #endif
