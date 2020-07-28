@@ -83,14 +83,42 @@ public:
 	}
 
 	// Добавление элемента на указанную позицию
-	void insert(unsigned pos, T element);
+	void insert(unsigned pos, T element)
+	{
+		if (pos < 0 || pos > _nodesCount)
+			throw out_of_range("Некорректный индекс!");
+
+		if (_nodesCount == 0)
+		{
+			_head = new Node(element);
+			_tail = _head;
+		}
+		else
+		{
+			if (pos == _nodesCount)
+				_tail = new Node(element, _tail, nullptr);
+			else if (pos == 0)
+				_head = new Node(element, nullptr, _head);
+			else
+			{
+				Node* current = _get_element(pos);
+				new Node(element, current->previous, current);
+			}
+		}
+		_nodesCount++;
+	}
 
 	// Добавление элемента в начало
-	void push_front(T element);
-
+	void push_front(T element)
+	{
+		insert(0, element);
+	}
 
 	// Добавление элемента в конец
-	void push_back(T element);
+	void push_back(T element)
+	{
+		insert(_nodesCount, element);
+	}
 
 	// Удаление элемента с начала
 	bool pop_back();
