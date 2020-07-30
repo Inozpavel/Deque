@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -217,16 +218,40 @@ public:
 	}
 
 	// Удаляет все элементы из [start; stop]
-	void erase(unsigned start, unsigned stop);
+	void erase(unsigned start, unsigned stop)
+	{
+		if (start == stop) 
+			return;
+		if (stop > _nodesCount)
+			throw out_of_range("Некорректный индекс!");
+		int max = max(start, stop);
+		unsigned min = min(start, stop);
+		
+		while (min < max)
+		{
+			remove_at(min);
+			max--;
+		}
+			
+	}
 
 	// Удаляет все элементы начиная со start
-	void erase(unsigned start);
+	void erase(unsigned start)
+	{
+		erase(start, _nodesCount);
+	}
 
 	// Очищает весь список
-	void clear();
+	void clear()
+	{
+		erase(0);
+	}
 
 	// Очистка памяти, удаление списка
-	//~Deque();
+	~Deque()
+	{
+		clear();
+	}
 };
 
 #endif
