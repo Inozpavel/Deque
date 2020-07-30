@@ -104,7 +104,7 @@ public:
 	void insert(unsigned pos, T element)
 	{
 		if (pos < 0 || pos > _nodesCount)
-			throw out_of_range("Некорректный индекс!");
+			throw out_of_range("Ошибка! Некорректно задан индекс!");
 
 		if (_nodesCount == 0)
 		{
@@ -139,13 +139,25 @@ public:
 	}
 
 	// Удаление элемента с начала
-	bool pop_back();
+	bool pop_back()
+	{
+		remove_at(_nodesCount - 1);
+	}
 
 	// Удаление элемента с конца
-	bool pop_front();
+	bool pop_front()
+	{
+		remove_at(0);
+	}
 
 	// Оператор [ ] позволяет по индексу получить ссылку на элемент списка
-	T& operator[](unsigned index);
+	T& operator[](unsigned index)
+	{
+		Node* element = _get_element(index);
+		if (element == nullptr)
+			throw out_of_range("Ошибка! Некорректно задан индекс!");
+		return element->data;
+	}
 
 	// Обмен местами элементов first и second
 	void swap(unsigned firstPos, unsigned secondPos);
@@ -223,7 +235,7 @@ public:
 		if (start == stop) 
 			return;
 		if (stop > _nodesCount)
-			throw out_of_range("Некорректный индекс!");
+			throw out_of_range("Ошибка! Некорректно задан индекс!");
 		int max = max(start, stop);
 		unsigned min = min(start, stop);
 		
