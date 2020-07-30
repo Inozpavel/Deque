@@ -42,7 +42,24 @@ private:
 	unsigned _nodesCount;
 
 	// Удаляет элемент, сохраняя целосность списка
-	bool _remove_node(Node* node);
+	bool _remove_node(Node* node)
+	{
+		if (node == nullptr) 
+			return false;
+		if (node->previous != nullptr)// head
+			node->previous->next = node->next;
+		else 
+			_head = node->next;
+
+		if (node->next != nullptr)// tail
+			node->next->previous = node->previous;
+		else 
+			_tail = node->previous;
+
+		delete node;
+		_nodesCount--;
+		return true;
+	}
 
 	// Ищет первый Node, данные в котором равны value
 	// Возвращает указатель на него в случае успеха, иначе nullptr
@@ -141,7 +158,12 @@ public:
 	bool remove_last(T value);
 
 	// Удаление элемента на позиции pos
-	bool remove_at(unsigned pos);
+	bool remove_at(unsigned pos)
+	{
+		if (!_remove_node(_get_element(pos)))
+			return false;
+		return true;
+	}
 
 	// Удаление всех элементов со значением value
 	// Вернёт количество удалённых элементов
@@ -171,7 +193,10 @@ public:
 	unsigned update_all(T oldValue, T newValue);
 
 	// Возвращает длину списка
-	unsigned size();
+	unsigned size()
+	{
+		return _nodesCount;
+	}
 
 	// Выводит список на экран, если передать true выведет список в обратном порядке
 	void print_all(bool reverse = false)
