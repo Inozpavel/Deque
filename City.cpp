@@ -1,6 +1,6 @@
 #include "City.h"
 
-City::City(string name, long peoplesCount) : _name(std::move(name)), _numberOfPeople(peoplesCount)
+City::City(string name, unsigned peoplesCount) : _name(std::move(name)), _numberOfPeople(peoplesCount)
 {
 }
 

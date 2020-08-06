@@ -17,7 +17,7 @@ private:
 
 public:
 
-	City(string name, long peoplesCount);
+	City(string name, unsigned peoplesCount);
 
 	City();
 
