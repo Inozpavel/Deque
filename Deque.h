@@ -32,10 +32,10 @@ private:
 			data(data), next(current), previous(previous)
 		{
 			if (previous != nullptr)
-			previous->next = this;
+				previous->next = this;
 
 			if (current != nullptr)
-			current->previous = this;
+				current->previous = this;
 		}
 	};
 	Node* _head;
@@ -45,16 +45,16 @@ private:
 	// Удаляет элемент, сохраняя целосность списка
 	bool _remove_node(Node* node)
 	{
-		if (node == nullptr) 
+		if (node == nullptr)
 			return false;
 		if (node->previous != nullptr)// head
 			node->previous->next = node->next;
-		else 
+		else
 			_head = node->next;
 
 		if (node->next != nullptr)// tail
 			node->next->previous = node->previous;
-		else 
+		else
 			_tail = node->previous;
 
 		delete node;
@@ -74,7 +74,7 @@ private:
 	// В стучае успеха возвращает указатель на него, иначе nullptr
 	Node* _get_element(unsigned index)
 	{
-		if (index < 0 || index > _nodesCount)
+		if (index < 0 || index >= _nodesCount)
 			return nullptr;
 		Node* element;
 		if (index <= _nodesCount / 2)
@@ -141,13 +141,13 @@ public:
 	// Удаление элемента с начала
 	bool pop_back()
 	{
-		remove_at(_nodesCount - 1);
+		return remove_at(_nodesCount - 1);
 	}
 
 	// Удаление элемента с конца
 	bool pop_front()
 	{
-		remove_at(0);
+		return remove_at(0);
 	}
 
 	// Оператор [ ] позволяет по индексу получить ссылку на элемент списка
@@ -160,7 +160,12 @@ public:
 	}
 
 	// Обмен местами элементов first и second
-	void swap(unsigned firstPos, unsigned secondPos);
+	void swap(unsigned firstPos, unsigned secondPos)
+	{
+		T tempdata = (*this)[firstPos];
+		(*this)[firstPos] = (*this)[secondPos];
+		(*this)[secondPos] = tempdata;
+	}
 
 	// Удаление одного (первого) элемента по значению value
 	// Вернёт true в случае успеха (нашёл)
