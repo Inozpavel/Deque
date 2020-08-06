@@ -62,13 +62,21 @@ private:
 		return true;
 	}
 
-	// Ищет первый Node, данные в котором равны value
+	// Ищет первый или последний Node, данные в котором равны value
 	// Возвращает указатель на него в случае успеха, иначе nullptr
-	Node* _search(T value, Node* element = nullptr);
-
-	// Ищет последний Node, данные в котором равны value
-	// Возвращает указатель на него в случае успеха, иначе nullptr
-	Node* _search_last(T value, Node* element = nullptr);
+	Node* _search(T value, bool isSearchFromEnd, Node* element = nullptr)
+	{
+		Node* current = element;
+		if (element == nullptr)
+			current = isSearchFromEnd? _tail : _head;
+		while (current != nullptr)
+		{
+			if (current->data == value)
+				return current;
+			current = isSearchFromEnd ? current->previous : current->next;
+		}
+		return nullptr;
+	}
 
 	// Ищет элемент по индексу
 	// В стучае успеха возвращает указатель на него, иначе nullptr
@@ -169,23 +177,33 @@ public:
 
 	// Удаление одного (первого) элемента по значению value
 	// Вернёт true в случае успеха (нашёл)
-	bool remove(T value);
+	bool remove(T value)
+	{
+		return _remove_node(_search(value, false));
+	}
 
 	// Удаление последнего элемента по значению value
 	// Вернёт true в случае успеха (нашёл)
-	bool remove_last(T value);
+	bool remove_last(T value)
+	{
+		return _remove_node(_search(value, true));
+	}
 
 	// Удаление элемента на позиции pos
 	bool remove_at(unsigned pos)
 	{
-		if (!_remove_node(_get_element(pos)))
-			return false;
-		return true;
+		return _remove_node(_get_element(pos));
 	}
 
 	// Удаление всех элементов со значением value
 	// Вернёт количество удалённых элементов
-	unsigned remove_all(T value);
+	unsigned remove_all(T value)
+	{
+		unsigned removedCount = 0;
+		while (remove(value))
+			removedCount++;
+		return removedCount;
+	}		
 
 	// Поиск одного элемента по значению
 	// В случае успеха вернёт позицию первого элемента
