@@ -1,28 +1,28 @@
 #include "City.h"
 
-City::City(string name, long peoplesCount) : _name(std::move(name)), _peoplesCount(peoplesCount)
+City::City(string name, unsigned peoplesCount) : _name(std::move(name)), _numberOfPeople(peoplesCount)
 {
 }
 
-City::City() : _name("Unknown"), _peoplesCount(0)
+City::City() : _name("Unknown"), _numberOfPeople(0)
 {
 }
 
 bool City::operator ==(City& other)
 {
-	return _name == other._name && _peoplesCount == other._peoplesCount;
+	return _name == other._name && _numberOfPeople == other._numberOfPeople;
 }
 
 City& City::operator=(City other)
 {
-	if(this == &other)
+	if (this == &other)
 		return *this;
 	_name = other._name;
-	_peoplesCount= other._peoplesCount;
+	_numberOfPeople = other._numberOfPeople;
 	return *this;
 }
 
-ostream& operator<<(ostream& out, City& clone)
+ostream& operator<<(ostream& out, City& element)
 {
-	return out << clone._name << ' ' << clone._peoplesCount;
+	return out << element._name << ' ' << element._numberOfPeople;
 }

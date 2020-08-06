@@ -5,7 +5,13 @@
 #include <iostream>
 #include <algorithm>
 
-using namespace std;
+using std::endl;
+using std::out_of_range;
+using std::cout;
+using std::cin;
+using std::min;
+using std::max;
+using std::vector;
 
 template <typename T>
 class Deque
@@ -39,6 +45,7 @@ private:
 				current->previous = this;
 		}
 	};
+
 	Node* _head;
 	Node* _tail;
 	unsigned _nodesCount;
@@ -49,12 +56,12 @@ private:
 	{
 		if (node == nullptr)
 			return false;
-		if (node->previous != nullptr)// head
+		if (node->previous != nullptr) // head
 			node->previous->next = node->next;
 		else
 			_head = node->next;
 
-		if (node->next != nullptr)// tail
+		if (node->next != nullptr) // tail
 			node->next->previous = node->previous;
 		else
 			_tail = node->previous;
@@ -359,10 +366,12 @@ public:
 	// stopIndex индекс включается в диапазон
 	void erase(unsigned startIndex, unsigned stopIndex)
 	{
+		if (_nodesCount == 0)
+			return;
 		if (stopIndex >= _nodesCount)
 			throw out_of_range("Ошибка! Некорректно задан индекс!");
-		int max = max(startIndex, stopIndex);
-		unsigned min = min(startIndex, stopIndex);
+		long max = max(startIndex, stopIndex);
+		long min = min(startIndex, stopIndex);
 		
 		while (min <= max)
 		{
