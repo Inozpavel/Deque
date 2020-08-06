@@ -218,15 +218,38 @@ public:
 	vector<unsigned> find_all(T value);
 
 	// Изменяет значение первого найденного элемента old_value на new_value 
-	bool update(T oldValue, T newValue);
+	bool update(T oldValue, T newValue)
+	{
+		Node* element = _search(oldValue, false);
+		if (element == nullptr)
+			return false;
+		element->data = newValue;
+		return true;
+	}
 
 	// Изменяет значение последнего найденного вхождения old_value на new_value
 	// Вернёт true при успехе
-	bool update_last(T oldValue, T newValue);
+	bool update_last(T oldValue, T newValue)
+	{		
+		Node* element = _search(oldValue, true);
+		if (element == nullptr)
+			return false;
+		element->data = newValue;
+		return true;
+	}
 
 	// Изменяет значение всех найденных вхождения old_value на new_value
 	// Вернёт количество замен
-	unsigned update_all(T oldValue, T newValue);
+	//Если old_value и new_value равны, вернет 0
+	unsigned update_all(T oldValue, T newValue)
+	{
+		if (oldValue == newValue)
+			return 0;
+		unsigned updatedCount = 0;
+		while (update(oldValue, newValue))
+			updatedCount++;
+		return updatedCount;
+	}
 
 	// Возвращает длину списка
 	unsigned size()
