@@ -339,7 +339,7 @@ public:
 	}
 #pragma endregion
 
-#pragma region Cleaning
+#pragma region Methods pop erase clear
 
 	// Удаление первого элемента с начала
 	// Если элемент удален успешно, вернет true, иначе false
@@ -356,16 +356,15 @@ public:
 	}
 
 	// Удаляет все элементы из диапазона [start..stop]
+	// stopIndex индекс включается в диапазон
 	void erase(unsigned startIndex, unsigned stopIndex)
 	{
-		if (startIndex == stopIndex) 
-			return;
-		if (stopIndex > _nodesCount)
+		if (stopIndex >= _nodesCount)
 			throw out_of_range("Ошибка! Некорректно задан индекс!");
 		int max = max(startIndex, stopIndex);
 		unsigned min = min(startIndex, stopIndex);
 		
-		while (min < max)
+		while (min <= max)
 		{
 			remove_at(min);
 			max--;
@@ -376,7 +375,7 @@ public:
 	// Удаляет все элементы начиная со start
 	void erase(unsigned startIndex)
 	{
-		erase(startIndex, _nodesCount);
+		erase(startIndex, _nodesCount - 1);
 	}
 
 	// Очищает весь список
