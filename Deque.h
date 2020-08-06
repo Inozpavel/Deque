@@ -43,6 +43,7 @@ private:
 	unsigned _nodesCount;
 
 	// Удаляет элемент, сохраняя целосность списка
+	// Если элемент удален успешно, вернет true, иначе false
 	bool _remove_node(Node* node)
 	{
 		if (node == nullptr)
@@ -100,13 +101,30 @@ private:
 		return element;
 	}
 
+	// Поиск первого или последнего элемента по значению
+	// В случае успеха вернёт позицию первого элемента
+	// По умолчанию поиск начинается с самого последнего элемента
+	unsigned _find(T value, bool isFromEnd, unsigned startPos)
+	{
+		for (Node* current = _get_element(startPos);
+			current != nullptr;
+			current = isFromEnd ? current->previous : current->next)
+		{
+			if (current->data == value)
+				return startPos;
+			startPos = isFromEnd ? --startPos : ++startPos;
+		}
+		return NOT_FOUND; // unsigned_max
+	}
+
 public:
-
+	// Константа, которая возвращается из функций, в которох не было результата
 	static unsigned const NOT_FOUND = ~0;
-
 	Deque() : _nodesCount(0), _head(nullptr), _tail(nullptr)
 	{
 	}
+
+#pragma region Adding elements
 
 	// Добавление элемента на указанную позицию
 	void insert(unsigned pos, T element)
@@ -146,17 +164,8 @@ public:
 		insert(_nodesCount, element);
 	}
 
-	// Удаление элемента с начала
-	bool pop_back()
-	{
-		return remove_at(_nodesCount - 1);
-	}
 
-	// Удаление элемента с конца
-	bool pop_front()
-	{
-		return remove_at(0);
-	}
+#pragma endregion
 
 	// Оператор [ ] позволяет по индексу получить ссылку на элемент списка
 	T& operator[](unsigned index)
@@ -174,6 +183,8 @@ public:
 		(*this)[firstPos] = (*this)[secondPos];
 		(*this)[secondPos] = tempdata;
 	}
+
+#pragma region Methods remove
 
 	// Удаление одного (первого) элемента по значению value
 	// Вернёт true в случае успеха (нашёл)
@@ -205,17 +216,62 @@ public:
 		return removedCount;
 	}		
 
+#pragma endregion
+
+#pragma region Methods find
+
 	// Поиск одного элемента по значению
 	// В случае успеха вернёт позицию первого элемента
-	unsigned find(T value, unsigned startPos = 0);
+	// Поиск начинается с элемента под индексом 0
+	unsigned find(T value)
+	{
+		return _find(value, false, 0);
+	}  
+	// Поиск одного элемента по значению
+	// В случае успеха вернёт позицию первого элемента
+	// Поиск начнется с позиции pos
+	unsigned find(T value, unsigned startPos)
+	{
+		return _find(value, false, startPos);
+	}
 
 	// Поиск последнего элемента по значению
 	// В случае успеха вернёт позицию первого элемента
-	unsigned find_last(T value, unsigned startPos);
+	// Поиск начинается с самого последнего элемента
+	unsigned find_last(T value)
+	{
+		return _find(value, true, _nodesCount - 1);
+	} 
+
+	// Поиск последнего элемента по значению
+	// В случае успеха вернёт позицию первого элемента
+	// Поиск начнется с позиции pos
+	unsigned find_last(T value, unsigned startPos)
+	{
+		return _find(value, true, startPos);
+	}
 
 	// Поиск всех элементов со значением value
 	// Вернёт список позиций найденных элементов
-	vector<unsigned> find_all(T value);
+	vector<unsigned> find_all(T value)
+	{
+		vector<unsigned> founds = {};
+		unsigned index = 0;
+		do
+		{
+			index = find(value, index);
+			if (index != NOT_FOUND)
+				founds.push_back(index);
+			else
+				break;
+			index++;
+		} while (index < _nodesCount);
+		return founds;
+	}
+
+#pragma endregion
+
+#pragma region Methods update
 
 	// Изменяет значение первого найденного элемента old_value на new_value 
 	bool update(T oldValue, T newValue)
@@ -251,6 +307,8 @@ public:
 		return updatedCount;
 	}
 
+#pragma endregion
+
 	// Возвращает длину списка
 	unsigned size()
 	{
@@ -273,6 +331,20 @@ public:
 		}
 		if (_nodesCount != 0)
 			cout << endl;
+	}
+
+#pragma region Cleaning
+
+	// Удаление элемента с начала
+	bool pop_back()
+	{
+		return remove_at(_nodesCount - 1);
+	}
+
+	// Удаление элемента с конца
+	bool pop_front()
+	{
+		return remove_at(0);
 	}
 
 	// Удаляет все элементы из [start; stop]
@@ -310,6 +382,9 @@ public:
 	{
 		clear();
 	}
+
+#pragma endregion
+
 };
 
 #endif
