@@ -1,4 +1,4 @@
-#ifndef CITY_H
+п»ї#ifndef CITY_H
 #define CITY_H
 
 #include <string>
@@ -11,22 +11,24 @@ using std::ostream;
 class City
 {
 private:
+
 	string _name;
-	unsigned _numbersOfPeople;
+	unsigned _numberOfPeople;
+
 public:
 
 	City(string name, long peoplesCount);
 
 	City();
 
-	// Сравнение двух экземпляров класса Person на равность
+	// РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… СЌРєР·РµРјРїР»СЏСЂРѕРІ РєР»Р°СЃСЃР° Person РЅР° СЂР°РІРЅРѕСЃС‚СЊ
 	bool operator ==(City& other);
 
-	// Для копирования объектов
+	// Р”Р»СЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ РѕР±СЉРµРєС‚РѕРІ
 	City& operator=(City other);
 
-	// Для вывода на консоль
-	friend ostream& operator <<(ostream& out, City& clone);
+	// Р”Р»СЏ РІС‹РІРѕРґР° РЅР° РєРѕРЅСЃРѕР»СЊ
+	friend ostream& operator <<(ostream& out, City& element);
 };
 
 #endif
