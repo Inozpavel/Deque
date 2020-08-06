@@ -5,7 +5,6 @@
 #include <iostream>
 #include <algorithm>
 
-
 using std::endl;
 using std::out_of_range;
 using std::cout;
@@ -367,10 +366,12 @@ public:
 	// stopIndex индекс включается в диапазон
 	void erase(unsigned startIndex, unsigned stopIndex)
 	{
+		if (_nodesCount == 0)
+			return;
 		if (stopIndex >= _nodesCount)
 			throw out_of_range("Ошибка! Некорректно задан индекс!");
-		int max = max(startIndex, stopIndex);
-		unsigned min = min(startIndex, stopIndex);
+		long max = max(startIndex, stopIndex);
+		long min = min(startIndex, stopIndex);
 		
 		while (min <= max)
 		{
