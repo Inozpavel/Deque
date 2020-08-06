@@ -11,17 +11,18 @@ template <typename T>
 class Deque
 {
 	/*
-	Структура двусвязного списка
+	Структура двусторонней очереди
 	nullptr <- head <--> node_1 <--> ... <--> node_n <--> tail -> nullptr
-	head - первый node
-	tail - последний node
-	Linked List[0] = head
-	Linked List[1] = head->next
-	Linked List[N-1] = tail
-	Linked List[N-2] = tail->previous
+	head - первый node (узел)
+	tail - последний node (узел)
+	Deque[0] = head
+	Deque[1] = head->next
+	Deque[N-1] = tail
+	Deque[N-2] = tail->previous
 	*/
 private:
-	//Узел списка, содержит данные, указатель на следующий и предыдущий элемент
+	//Узел списка, содержит данные (data) типа T, 
+	//указатель на следующий (next) и предыдущий элемент (previous)
 	struct Node
 	{
 		T data;
@@ -63,7 +64,7 @@ private:
 		return true;
 	}
 
-	// Ищет первый или последний Node, данные в котором равны value
+	// Ищет первый или последний элемент, данные в котором равны value
 	// Возвращает указатель на него в случае успеха, иначе nullptr
 	Node* _search(T value, bool isSearchFromEnd, Node* element = nullptr)
 	{
@@ -101,18 +102,17 @@ private:
 		return element;
 	}
 
-	// Поиск первого или последнего элемента по значению
-	// В случае успеха вернёт позицию первого элемента
-	// По умолчанию поиск начинается с самого последнего элемента
-	unsigned _find(T value, bool isFromEnd, unsigned startPos)
+	// Ищет первый или последний элемент по значению
+	// В случае успеха вернёт позицию элемента, иначе константу NOT_FOUND
+	unsigned _find(T value, bool isStartingFromEnd, unsigned startIndex)
 	{
-		for (Node* current = _get_element(startPos);
+		for (Node* current = _get_element(startIndex);
 			current != nullptr;
-			current = isFromEnd ? current->previous : current->next)
+			current = isStartingFromEnd ? current->previous : current->next)
 		{
 			if (current->data == value)
-				return startPos;
-			startPos = isFromEnd ? --startPos : ++startPos;
+				return startIndex;
+			startIndex = isStartingFromEnd ? --startIndex : ++startIndex;
 		}
 		return NOT_FOUND; // unsigned_max
 	}
@@ -120,6 +120,7 @@ private:
 public:
 	// Константа, которая возвращается из функций, в которох не было результата
 	static unsigned const NOT_FOUND = ~0;
+
 	Deque() : _nodesCount(0), _head(nullptr), _tail(nullptr)
 	{
 	}
@@ -127,80 +128,63 @@ public:
 #pragma region Adding elements
 
 	// Добавление элемента на указанную позицию
-	void insert(unsigned pos, T element)
+	void insert(unsigned index, T newElement)
 	{
-		if (pos < 0 || pos > _nodesCount)
+		if (index < 0 || index > _nodesCount)
 			throw out_of_range("Ошибка! Некорректно задан индекс!");
 
 		if (_nodesCount == 0)
 		{
-			_head = new Node(element);
+			_head = new Node(newElement);
 			_tail = _head;
 		}
 		else
 		{
-			if (pos == _nodesCount)
-				_tail = new Node(element, _tail, nullptr);
-			else if (pos == 0)
-				_head = new Node(element, nullptr, _head);
+			if (index == _nodesCount)
+				_tail = new Node(newElement, _tail, nullptr);
+			else if (index == 0)
+				_head = new Node(newElement, nullptr, _head);
 			else
 			{
-				Node* current = _get_element(pos);
-				new Node(element, current->previous, current);
+				Node* current = _get_element(index);
+				new Node(newElement, current->previous, current);
 			}
 		}
 		_nodesCount++;
 	}
 
 	// Добавление элемента в начало
-	void push_front(T element)
+	void push_front(T newElement)
 	{
-		insert(0, element);
+		insert(0, newElement);
 	}
 
 	// Добавление элемента в конец
-	void push_back(T element)
+	void push_back(T newElement)
 	{
-		insert(_nodesCount, element);
+		insert(_nodesCount, newElement);
 	}
-
 
 #pragma endregion
-
-	// Оператор [ ] позволяет по индексу получить ссылку на элемент списка
-	T& operator[](unsigned index)
-	{
-		Node* element = _get_element(index);
-		if (element == nullptr)
-			throw out_of_range("Ошибка! Некорректно задан индекс!");
-		return element->data;
-	}
-
-	// Обмен местами элементов first и second
-	void swap(unsigned firstPos, unsigned secondPos)
-	{
-		T tempdata = (*this)[firstPos];
-		(*this)[firstPos] = (*this)[secondPos];
-		(*this)[secondPos] = tempdata;
-	}
-
+	
 #pragma region Methods remove
 
 	// Удаление одного (первого) элемента по значению value
-	// Вернёт true в случае успеха (нашёл)
+	// Вернёт true в случае успешного удаления, иначе false
 	bool remove(T value)
 	{
 		return _remove_node(_search(value, false));
 	}
 
-	// Удаление последнего элемента по значению value
-	// Вернёт true в случае успеха (нашёл)
+	// Удаление одного (последнего) элемента по значению value
+	// Вернёт true в случае успешного удаления, иначе false
 	bool remove_last(T value)
 	{
 		return _remove_node(_search(value, true));
 	}
 
-	// Удаление элемента на позиции pos
+	// Удаление одного элемента на позиции pos
+	// Вернёт true в случае успешного удаления, иначе false
 	bool remove_at(unsigned pos)
 	{
 		return _remove_node(_get_element(pos));
@@ -221,38 +205,38 @@ public:
 #pragma region Methods find
 
 	// Поиск одного элемента по значению
-	// В случае успеха вернёт позицию первого элемента
-	// Поиск начинается с элемента под индексом 0
+	// В случае успеха вернёт позицию первого элемента, иначе константу NOT_FOUND
+	// Поиск начинается с первого элемента и пройдет до конца списка
 	unsigned find(T value)
 	{
 		return _find(value, false, 0);
 	}  
 	// Поиск одного элемента по значению
-	// В случае успеха вернёт позицию первого элемента
-	// Поиск начнется с позиции pos
-	unsigned find(T value, unsigned startPos)
+	// В случае успеха вернёт позицию первого элемента, иначе константу NOT_FOUND
+	// Поиск начнется с позиции pos	и пройдет до конца списка
+	unsigned find(T value, unsigned startIndex)
 	{
-		return _find(value, false, startPos);
+		return _find(value, false, startIndex);
 	}
 
 	// Поиск последнего элемента по значению
-	// В случае успеха вернёт позицию первого элемента
-	// Поиск начинается с самого последнего элемента
+	// В случае успеха вернёт позицию первого элемента, иначе константу NOT_FOUND
+	// Поиск начинается с последнего элемента и пройдет до начала списка
 	unsigned find_last(T value)
 	{
 		return _find(value, true, _nodesCount - 1);
 	} 
 
 	// Поиск последнего элемента по значению
-	// В случае успеха вернёт позицию первого элемента
-	// Поиск начнется с позиции pos
-	unsigned find_last(T value, unsigned startPos)
+	// В случае успеха вернёт позицию первого элемента, иначе константу NOT_FOUND
+	// Поиск начнется с позиции pos	и пройдет до начала списка
+	unsigned find_last(T value, unsigned startIndex)
 	{
-		return _find(value, true, startPos);
+		return _find(value, true, startIndex);
 	}
 
 	// Поиск всех элементов со значением value
-	// Вернёт список позиций найденных элементов
+	// Вернёт список (vector<unsigned>) всех позиций найденных элементов
 	vector<unsigned> find_all(T value)
 	{
 		vector<unsigned> founds = {};
@@ -273,7 +257,8 @@ public:
 
 #pragma region Methods update
 
-	// Изменяет значение первого найденного элемента old_value на new_value 
+	// Изменяет значение первого найденного элемента со значением oldValue на newValue 
+	// Вернёт true при в случае успеха, иначе false
 	bool update(T oldValue, T newValue)
 	{
 		Node* element = _search(oldValue, false);
@@ -283,8 +268,8 @@ public:
 		return true;
 	}
 
-	// Изменяет значение последнего найденного вхождения old_value на new_value
-	// Вернёт true при успехе
+	// Изменяет значение последнего найденного элемента со значением oldValue на newValue 
+	// Вернёт true при в случае успеха, иначе false
 	bool update_last(T oldValue, T newValue)
 	{		
 		Node* element = _search(oldValue, true);
@@ -294,9 +279,9 @@ public:
 		return true;
 	}
 
-	// Изменяет значение всех найденных вхождения old_value на new_value
+	// Изменяет значение всех элементов со значением oldValue на newValue 
 	// Вернёт количество замен
-	//Если old_value и new_value равны, вернет 0
+	// Если oldValue и newValue равны, вернет 0
 	unsigned update_all(T oldValue, T newValue)
 	{
 		if (oldValue == newValue)
@@ -309,17 +294,20 @@ public:
 
 #pragma endregion
 
-	// Возвращает длину списка
+#pragma region Useful methods
+
+
+	// Возвращает количество элементов в списке
 	unsigned size()
 	{
 		return _nodesCount;
 	}
 
 	// Выводит список на экран, если передать true выведет список в обратном порядке
-	void print_all(bool reverse = false)
+	void print_all(bool isPrintReversed = false)
 	{
 		cout << "Список:" << endl;
-		if (reverse == false)
+		if (isPrintReversed == false)
 		{
 			for (Node* current = _head; current != nullptr; current = current -> next)
 				cout << current->data << endl;
@@ -333,29 +321,49 @@ public:
 			cout << endl;
 	}
 
+	// Оператор [ ] позволяет по индексу получить ссылку на данные элемента списка
+	T& operator[](unsigned index)
+	{
+		Node* element = _get_element(index);
+		if (element == nullptr)
+			throw out_of_range("Ошибка! Некорректно задан индекс!");
+		return element->data;
+	}
+
+	// Обмен местами элементов двух элементов
+	void swap(unsigned firstElementIndex, unsigned secondElementIndex)
+	{
+		T tempdata = (*this)[firstElementIndex];
+		(*this)[firstElementIndex] = (*this)[secondElementIndex];
+		(*this)[secondElementIndex] = tempdata;
+	}
+#pragma endregion
+
 #pragma region Cleaning
 
-	// Удаление элемента с начала
+	// Удаление первого элемента с начала
+	// Если элемент удален успешно, вернет true, иначе false
 	bool pop_back()
 	{
 		return remove_at(_nodesCount - 1);
 	}
 
-	// Удаление элемента с конца
+	// Удаление первого элемента с конца
+	// Если элемент удален успешно, вернет true, иначе false
 	bool pop_front()
 	{
 		return remove_at(0);
 	}
 
-	// Удаляет все элементы из [start; stop]
-	void erase(unsigned start, unsigned stop)
+	// Удаляет все элементы из диапазона [start..stop]
+	void erase(unsigned startIndex, unsigned stopIndex)
 	{
-		if (start == stop) 
+		if (startIndex == stopIndex) 
 			return;
-		if (stop > _nodesCount)
+		if (stopIndex > _nodesCount)
 			throw out_of_range("Ошибка! Некорректно задан индекс!");
-		int max = max(start, stop);
-		unsigned min = min(start, stop);
+		int max = max(startIndex, stopIndex);
+		unsigned min = min(startIndex, stopIndex);
 		
 		while (min < max)
 		{
@@ -366,9 +374,9 @@ public:
 	}
 
 	// Удаляет все элементы начиная со start
-	void erase(unsigned start)
+	void erase(unsigned startIndex)
 	{
-		erase(start, _nodesCount);
+		erase(startIndex, _nodesCount);
 	}
 
 	// Очищает весь список
